@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Printer Buddy AI</title><style>:root{--bg:#0f1115;--card:#171a21;--line:#262b36;--text:#e5e7eb;--dim:#9ca3af;--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--accent:#60a5fa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+header h1{font-size:17px;margin:0;font-weight:600}header .pill{margin-left:auto}
+.pill{padding:3px 10px;border-radius:99px;background:var(--line);color:var(--dim);font-size:13px}
+.pill.ok{background:#14532d;color:var(--ok)}.pill.warn{background:#713f12;color:var(--warn)}.pill.bad{background:#7f1d1d;color:var(--bad)}
+nav{display:flex;gap:4px;padding:8px 14px;border-bottom:1px solid var(--line)}
+nav button{background:none;border:0;color:var(--dim);padding:8px 12px;border-radius:8px;font:inherit;cursor:pointer}
+nav button.on{background:var(--card);color:var(--text)}
+main{max-width:1100px;margin:0 auto;padding:16px;display:grid;gap:16px}
+.grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px}@media(max-width:800px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card h2{font-size:14px;margin:0 0 10px;color:var(--dim);font-weight:500}
+.cam{width:100%;aspect-ratio:16/9;object-fit:contain;background:#000;border-radius:8px;display:block}
+.bar{display:grid;grid-template-columns:110px 1fr 46px;align-items:center;gap:8px;margin:7px 0;font-size:14px}
+.track{position:relative;height:12px;background:var(--line);border-radius:6px;overflow:hidden}
+.fill{height:100%;border-radius:6px;background:var(--ok);transition:width .4s}
+.th{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--text);opacity:.5}
+.bar .v{text-align:right;color:var(--dim);font-variant-numeric:tabular-nums}.bar .n.alert::after{content:" !";color:var(--warn)}
+.meta{color:var(--dim);font-size:13px;display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:10px}
+svg.spark{width:100%;height:60px;display:block}
+input,select{background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font:inherit}
+button.b{background:var(--accent);color:#0b1220;border:0;border-radius:8px;padding:8px 14px;font:inherit;font-weight:600;cursor:pointer}
+button.g{background:var(--line);color:var(--text)}button.r{background:#7f1d1d;color:var(--bad)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}td{padding:6px 4px;border-top:1px solid var(--line)}
+.frames{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.frame img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;display:block;background:#000}
+.frame .labels{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}.frame .labels button{font-size:12px;padding:3px 7px;border-radius:6px;border:1px solid var(--line);background:none;color:var(--dim);cursor:pointer}
+.frame .labels button.on{background:var(--accent);color:#0b1220;border-color:var(--accent)}
+.small{font-size:12px;color:var(--dim)}.hide{display:none}</style></head>
+<body>
+<header><h1>Printer Buddy AI</h1><span id="backend" class="small"></span><span id="pill" class="pill">Starting</span></header>
+<nav><button data-tab="watch" class="on">Monitor</button><button data-tab="improve">Help improve the AI</button></nav>
+<main>
+  <section id="tab-watch" class="grid">
+    <div class="card"><h2>Camera</h2><img id="live" class="cam" alt="">
+      <div class="meta"><span id="file"></span><span id="prog"></span><span id="last"></span><span id="took"></span></div>
+      <div class="row"><select id="capture"><option value="">Send this picture for AI training &#9662;</option></select><span id="capmsg" class="small"></span></div>
+      <div class="row" style="align-items:flex-start"><img id="cam" alt="" style="width:160px;aspect-ratio:16/9;object-fit:contain;background:#000;border-radius:6px">
+        <span class="small">Last frame the AI checked</span></div></div>
+    <div class="card"><h2>Detection</h2><div id="bars"></div>
+      <div class="row"><button class="b g" id="checknow">Check now</button><span id="chk" class="small"></span></div>
+      <h2 style="margin-top:14px">Highest alert score</h2><svg id="spark" class="spark" viewBox="0 0 300 60" preserveAspectRatio="none"></svg>
+      <div class="meta" id="err"></div></div>
+    <div class="card" style="grid-column:1/-1"><h2>Settings</h2>
+      <div class="row">Alert at <select id="threshold"><option>0.4</option><option>0.5</option><option>0.6</option><option>0.7</option><option>0.8</option></select>
+        for <select id="checks"><option>1</option><option>2</option><option>3</option><option>5</option></select> checks in a row,
+        check every <select id="interval"><option value="5">5 s</option><option value="10">10 s</option><option value="20">20 s</option><option value="30">30 s</option><option value="60">60 s</option></select>
+        <label><input type="checkbox" id="pause"> pause the print</label>
+        <button class="b" id="save">Save</button><span id="saved" class="small"></span></div></div>
+  </section>
+
+  <section id="tab-improve" class="hide"><div class="card"><h2>Help improve the AI</h2>
+    <p class="small">A photo is kept every 15 checks, and on every check where the AI thinks it sees a failure. Photos you send go to the Printer Buddy dataset and make the next model better. Nothing is sent while sending is off.</p>
+    <div class="row"><label><input type="checkbox" id="contrib"> Allow sending photos</label>
+      <label><input type="checkbox" id="autosend"> Send them by themselves when a print ends</label><span id="cmsg" class="small"></span></div>
+    <p class="small">Automatic sending labels each print's photos from how it ended: a finished print's photos as "looks fine" (anything the AI flagged was a false alarm), a cancelled or failed print's flagged photos with what the AI saw. Your own labels are never changed.</p>
+    <div id="frames" class="frames"></div></div></section>
+</main>
+<script>
+function bars(el, labels, th){
+  el.innerHTML = labels.map(l => {
+    const s = l.score == null ? 0 : l.score, pct = Math.round(s*100);
+    const col = !l.alert ? (s >= th ? 'var(--warn)' : 'var(--accent)') : s >= th ? 'var(--bad)' : s >= th*0.7 ? 'var(--warn)' : 'var(--ok)';
+    return '<div class="bar"><span class="n'+(l.alert?' alert':'')+'">'+l.name.replace('_',' ')+'</span>'+
+      '<div class="track"><div class="fill" style="width:'+pct+'%;background:'+col+'"></div><div class="th" style="left:'+(th*100)+'%"></div></div>'+
+      '<span class="v">'+(l.score==null?'-':pct+'%')+'</span></div>';
+  }).join('');
+}
+function spark(el, hist, th){
+  const w = 300, h = 60, n = hist.length;
+  if (n < 2) { el.innerHTML = ''; return; }
+  const pts = hist.map((v,i) => (i*w/(n-1)).toFixed(1)+','+(h - Math.min(Math.max(v,0),1)*h).toFixed(1)).join(' ');
+  el.innerHTML = '<line x1="0" x2="'+w+'" y1="'+(h-th*h)+'" y2="'+(h-th*h)+'" stroke="#4b5563" stroke-dasharray="4 4"/>'+
+    '<polyline points="'+pts+'" fill="none" stroke="var(--accent)" stroke-width="2"/>';
+}
+function pill(el, s){
+  const cls = s.alerted ? 'bad' : !s.printing ? '' : s.strikes ? 'warn' : 'ok';
+  el.className = 'pill ' + cls; el.textContent = s.error && s.printing ? 'Error' : s.status;
+}
+function ago(t){ if (!t) return 'never'; const s = Math.round(Date.now()/1000 - t); return s < 60 ? s+' s ago' : Math.round(s/60)+' min ago'; }
+const $ = id => document.getElementById(id);
+let tab = 'watch', labelsAll = [];
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  tab = b.dataset.tab; ['watch','improve'].forEach(t => $('tab-'+t).classList.toggle('hide', t !== tab));
+  if (tab === 'improve') loadFrames();
+});
+const api = (p, o) => fetch(p, o && {method: o.method || 'POST', headers: {'Content-Type':'application/json'}, body: o.body && JSON.stringify(o.body)}).then(r => r.json().then(j => (j.httpStatus = r.status, j)));
+let settingsShown = false, lastCheck = 0;
+async function tick(){
+  try {
+    const s = await api('/api/status');
+    pill($('pill'), s); $('backend').textContent = s.backend_note || '';
+    bars($('bars'), s.labels, s.threshold); spark($('spark'), s.history, s.threshold);
+    $('file').textContent = s.printing ? s.filename : 'Not printing';
+    $('prog').textContent = s.printing ? Math.round(s.progress*100)+'%' : '';
+    $('last').textContent = 'Last check ' + ago(s.last_check); $('took').textContent = s.took_ms ? s.took_ms+' ms per check' : '';
+    $('err').textContent = s.error || '';
+    if (!s.checking && $('chk').textContent === 'Checking...') $('chk').textContent = 'Done';
+    if (s.last_check && s.last_check !== lastCheck) { lastCheck = s.last_check; $('cam').src = '/api/frame.jpg?t=' + s.last_check; }
+    if (!settingsShown) { settingsShown = true; $('threshold').value = s.threshold; $('checks').value = s.checks_in_a_row; $('interval').value = s.interval; $('pause').checked = s.pause; $('contrib').checked = s.contribute; $('autosend').checked = s.autosend; $('autosend').disabled = !s.contribute; }
+  } catch (e) { $('pill').textContent = 'Offline'; $('pill').className = 'pill bad'; }
+}
+// "Send this picture for AI training": label the camera picture right now and send it
+(async () => {
+  const j = await api('/api/frames');
+  const nice = l => l === 'ok' ? 'It looks fine' : 'It shows ' + l.replace('_', ' ');
+  $('capture').innerHTML += j.labels.map(l => '<option value="' + l + '">' + nice(l) + '</option>').join('');
+})();
+$('capture').onchange = async () => {
+  const l = $('capture').value; if (!l) return;
+  $('capture').disabled = true; $('capmsg').textContent = 'Sending...';
+  const r = await api('/api/capture', {body: {label: l}});
+  $('capmsg').textContent = r.message || r.error || ''; $('capture').value = ''; $('capture').disabled = false;
+  if (tab === 'improve') loadFrames();
+};
+$('checknow').onclick = async () => { const r = await api('/api/check', {body: {}}); $('chk').textContent = r.error || 'Checking...'; };
+$('save').onclick = async () => { await api('/api/settings', {body: {threshold: +$('threshold').value, checks_in_a_row: +$('checks').value, interval: +$('interval').value, pause: $('pause').checked}}); $('saved').textContent = 'Saved'; setTimeout(() => $('saved').textContent = '', 2000); };
+$('contrib').onchange = async () => { await api('/api/settings', {body: {contribute: $('contrib').checked}}); loadFrames(); };
+$('autosend').onchange = async () => { await api('/api/settings', {body: {autosend: $('autosend').checked}}); loadFrames(); };
+async function loadFrames(){
+  const j = await api('/api/frames'); labelsAll = j.labels;
+  $('contrib').checked = j.contribute; $('autosend').checked = j.autosend; $('autosend').disabled = !j.contribute;
+  const nice = l => l === 'ok' ? 'looks fine' : l.replace('_', ' ');
+  $('frames').innerHTML = j.frames.length ? j.frames.map(f => {
+    const top = Object.entries(f.scores).sort((a,b) => b[1]-a[1])[0] || ['', 0];
+    const atop = Object.entries(f.scores).filter(([k]) => j.alert.includes(k)).sort((a,b) => b[1]-a[1])[0] || ['', 0];
+    const flagged = f.source === 'alert' || atop[1] >= f.threshold;
+    const sent = f.status === 'sent', can = j.contribute;
+    let body = '';
+    if (!sent) {
+      if (flagged && !f.label)
+        body += '<div class="small" style="margin-top:6px">The AI saw ' + nice(atop[0]) + '. Was it right?</div>' +
+          '<div class="row"><button class="b" ' + (can ? '' : 'disabled') + ' onclick="sendAs(\'' + f.id + '\',\'' + atop[0] + '\')">Right, it failed</button>' +
+          '<button class="b g" ' + (can ? '' : 'disabled') + ' onclick="sendAs(\'' + f.id + '\',\'ok\')">False alarm</button></div>';
+      else if (!f.label)
+        body += '<div class="small" style="margin-top:6px">The AI saw no failure. If there is one, pick it and send: it counts as one the AI missed.</div>';
+      body += '<div class="labels">' + labelsAll.map(l => '<button class="' + (f.label === l ? 'on' : '') + '" onclick="label(\'' + f.id + '\',\'' + l + '\')">' + nice(l) + '</button>').join('') + '</div>' +
+        '<div class="row"><button class="b" ' + (f.label && can ? '' : 'disabled') + ' onclick="send(\'' + f.id + '\')">Send</button><button class="b g" onclick="del(\'' + f.id + '\')">Delete</button></div>';
+    }
+    return '<div class="frame card" id="f-' + f.id + '">' + (sent ? '<div class="cam" style="aspect-ratio:4/3;display:grid;place-items:center">Sent, thank you</div>' : '<img loading="lazy" src="/api/frames/' + f.id + '.jpg">') +
+      '<div class="small" style="margin-top:6px">' + new Date(f.time * 1000).toLocaleString() + ' · ' + (flagged ? 'flagged · ' : '') + 'AI: ' + nice(top[0]) + ' ' + Math.round(top[1] * 100) + '%' + (f.label ? ' · label: ' + nice(f.label) : '') + '</div>' + body + '</div>';
+  }).join('') : '<p class="small">No photos yet: they are kept while a print is being watched.</p>';
+}
+window.sendAs = async (id, l) => { const r = await api('/api/frames/' + id + '/send', {body: {label: l}}); $('cmsg').textContent = r.message || r.error || ''; loadFrames(); };
+window.label = async (id, l) => { await api('/api/frames/'+id+'/label', {body: {label: l}}); loadFrames(); };
+window.send = async id => { const r = await api('/api/frames/'+id+'/send', {body: {}}); $('cmsg').textContent = r.message || r.error || ''; loadFrames(); };
+window.del = async id => { await api('/api/frames/'+id, {method:'DELETE'}); loadFrames(); };
+// live camera: the printer's own stream (nothing goes through this service); snapshots if there's no stream
+async function startLive(){
+  const img = $('live');
+  try {
+    const c = await api('/api/camera');
+    let u = c.stream_url || '';
+    if (u) {
+      if (u.startsWith('/')) u = location.protocol + '//' + location.hostname + u;
+      u = u.replace(/\/\/(127\.0\.0\.1|localhost)(?=[:/])/, '//' + location.hostname);
+      img.onerror = () => { img.onerror = null; snapLoop(); };
+      img.src = u; return;
+    }
+  } catch (e) {}
+  snapLoop();
+}
+function snapLoop(){
+  const img = $('live');
+  const next = () => setTimeout(() => { img.src = '/api/live.jpg?t=' + Date.now(); }, 500);
+  img.onload = next; img.onerror = () => setTimeout(next, 3000);
+  img.src = '/api/live.jpg?t=' + Date.now();
+}
+startLive();
+tick(); setInterval(tick, 3000);
+</script></body></html>

@@ -1,0 +1,97 @@
+{
+  "file": "printer-buddy-lite256.int8.bin",
+  "format": "pbq8",
+  "version": 3,
+  "image_size": 256,
+  "labels": [
+    "spaghetti",
+    "warping",
+    "first_layer",
+    "failure",
+    "stringing",
+    "blob",
+    "crack"
+  ],
+  "alert": [
+    "spaghetti",
+    "warping",
+    "first_layer",
+    "failure"
+  ],
+  "input": "RGB bytes, CHW (the engine subtracts the channel means)",
+  "means": [
+    124,
+    116,
+    104
+  ],
+  "out_scale": [
+    8.40942492104291e-06,
+    6.3305484057980684e-06,
+    8.688326549733692e-06,
+    5.367701805749051e-06,
+    8.163711803395778e-06,
+    6.218544184341039e-06,
+    5.656595364499855e-06
+  ],
+  "out_bias": [
+    -0.026196805760264397,
+    -0.1258155256509781,
+    -0.09951711446046829,
+    -0.09920699149370193,
+    -0.10965190082788467,
+    -0.0714235007762909,
+    -0.0939190462231636
+  ],
+  "bytes": 1700972,
+  "max_activation_values": 294912,
+  "max_acc_pixels": 16384,
+  "calibration_images": 300,
+  "test_images": 400,
+  "test": {
+    "0.5": {
+      "float": {
+        "precision": 0.9119,
+        "recall": 0.8934,
+        "f1": 0.9026,
+        "false_alarm_rate": 0.0837
+      },
+      "int8": {
+        "precision": 0.9072,
+        "recall": 0.8934,
+        "f1": 0.9003,
+        "false_alarm_rate": 0.0887
+      }
+    },
+    "0.6": {
+      "float": {
+        "precision": 0.9158,
+        "recall": 0.8832,
+        "f1": 0.8992,
+        "false_alarm_rate": 0.0788
+      },
+      "int8": {
+        "precision": 0.9115,
+        "recall": 0.8883,
+        "f1": 0.8997,
+        "false_alarm_rate": 0.0837
+      }
+    },
+    "0.7": {
+      "float": {
+        "precision": 0.9206,
+        "recall": 0.8832,
+        "f1": 0.9016,
+        "false_alarm_rate": 0.0739
+      },
+      "int8": {
+        "precision": 0.9206,
+        "recall": 0.8832,
+        "f1": 0.9016,
+        "false_alarm_rate": 0.0739
+      }
+    }
+  },
+  "same_alert_decision": 0.99,
+  "mean_score_difference": 0.00392,
+  "vectors": "int8.vectors.bin"
+}
