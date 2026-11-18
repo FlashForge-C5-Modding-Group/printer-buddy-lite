@@ -31,15 +31,35 @@ if [ "$OC_TUNNELED" = 1 ] && [ -f "$CONF" ]; then
                    sleep 30; exit 1 ;;
             esac ;;
     esac
-    # The camera stays on the printer
-    if [ -z "$(setting camera_url)" ]; then
-        for cam in http://127.0.0.1:8080/snapshot "http://127.0.0.1:8080/?action=snapshot"; do
-            if wget -q -T 3 -O /dev/null "$cam" 2>/dev/null; then
-                set_setting camera_url "$cam"
-                echo "Printer Buddy Lite: using the printer's camera at $cam"
-                break
+fi
+
+# The camera: always taken straight from the camera itself, never from Moonraker's webcam
+# entry, whose snapshot address often doesn't work from the printer (a relative /webcam/
+# path nginx doesn't serve, a .local name, or none at all). First the printer's own camera,
+# then the IP and port of each webcam's stream address, which a browser already shows.
+# Whichever answers is written to camera_url at every start; if none does, it's left as is.
+camera_hosts() {
+    echo http://127.0.0.1:8080
+    mr=$(setting moonraker)
+    wget -q -T 5 -O - "${mr:-http://127.0.0.1:7125}/server/webcams/list" 2>/dev/null |
+        grep -o '"\(stream\|snapshot\)_url": *"https\{0,1\}://[^/"]*' |
+        sed 's|.*"\(https\{0,1\}://[^/"]*\)$|\1|'
+}
+if [ -f "$CONF" ]; then
+    found=
+    for host in $(camera_hosts | awk '!seen[$0]++'); do
+        for path in "/?action=snapshot" /snapshot; do
+            if wget -q -T 3 -O /dev/null "$host$path" 2>/dev/null; then
+                found=$host$path
+                break 2
             fi
         done
+    done
+    if [ -n "$found" ]; then
+        [ "$(setting camera_url)" = "$found" ] || set_setting camera_url "$found"
+        echo "Printer Buddy Lite: camera at $found"
+    else
+        echo "Printer Buddy Lite: no camera answered; keeping camera_url '$(setting camera_url)'" >&2
     fi
 fi
 

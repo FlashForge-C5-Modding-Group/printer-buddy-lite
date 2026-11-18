@@ -17,7 +17,7 @@ Open **http://PRINTER-IP:7180/** after installation. The plugin starts automatic
 ### Tunneled printers
 
 Install it on the printer, not the SBC: it runs on the printer's X2600. It finds the SBC's Moonraker by itself
-(`oc-plugin moonraker --find`) and uses the printer's own camera. If several tunneled printers are on the
+(`oc-plugin moonraker --find`). If several tunneled printers are on the
 network, pick this printer's SBC once with `oc-plugin moonraker --scan`. To use another Moonraker, set
 `moonraker` in the settings yourself; it's left alone unless it points at the printer itself.
 
@@ -30,3 +30,11 @@ network, pick this printer's SBC once with `oc-plugin moonraker --scan`. To use 
 - `opencreator-plugin.json` — plugin manifest
 
 Settings and captured photos are stored outside this repository in OpenCreator's plugin data directory.
+
+### Camera
+
+At every start the plugin finds the camera itself instead of using the snapshot address in Moonraker's webcam
+settings, which often doesn't work from the printer (a relative `/webcam/` path, a `.local` name, or none). It
+tries the printer's own camera (`http://127.0.0.1:8080`) and then the IP and port of each webcam's stream address,
+with `/?action=snapshot` and `/snapshot`, and writes the first that answers to `camera_url`. If none answers,
+`camera_url` is left as it is.
