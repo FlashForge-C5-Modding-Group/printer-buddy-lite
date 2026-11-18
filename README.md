@@ -14,6 +14,13 @@ oc-plugin install https://github.com/FlashForge-C5-Modding-Group/printer-buddy-l
 
 Open **http://PRINTER-IP:7180/** after installation. The plugin starts automatically and restarts on boot.
 
+### Tunneled printers
+
+Install it on the printer, not the SBC: it runs on the printer's X2600. It finds the SBC's Moonraker by itself
+(`oc-plugin moonraker --find`) and uses the printer's own camera. If several tunneled printers are on the
+network, pick this printer's SBC once with `oc-plugin moonraker --scan`. To use another Moonraker, set
+`moonraker` in the settings yourself; it's left alone unless it points at the printer itself.
+
 ## Contents
 
 - `c/sep_ai` — compiled native service and WebUI/photo API

@@ -4,6 +4,13 @@ set -e
 HERE=$(cd "$(dirname "$0")/.." && pwd)
 DATA="${OC_PLUGIN_DATA:-$HERE}"
 
+# The native service runs on the printer's X2600, so on a tunneled install it goes on the
+# printer, not the SBC.
+if [ ! -d /usr/prog/PROGRAM ]; then
+    echo "Printer Buddy Lite: install this on the printer itself (SoC or tunneled), not on the SBC" >&2
+    exit 1
+fi
+
 for f in c/sep_ai webui/index.html models/pbai-x2600rv.bin models/printer-buddy-lite256.int8.bin models/int8.json; do
     [ -f "$HERE/$f" ] || { echo "Printer Buddy Lite: package file missing: $f" >&2; exit 1; }
 done
