@@ -38,3 +38,9 @@ settings, which often doesn't work from the printer (a relative `/webcam/` path,
 tries the printer's own camera (`http://127.0.0.1:8080`) and then the IP and port of each webcam's stream address,
 with `/?action=snapshot` and `/snapshot`, and writes the first that answers to `camera_url`. If none answers,
 `camera_url` is left as it is.
+
+### Sending photos to the dataset
+
+With `contribute` and `autosend` on, photos labelled automatically when a print ends are sent one in every
+`autosend_every` (default 25; the count carries over between prints). The rest aren't sent. Photos you label
+yourself are always sent.

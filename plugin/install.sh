@@ -35,6 +35,7 @@ mkdir -p "$DATA/data/frames"
   "keep_alerts": 60,
   "contribute": false,
   "autosend": false,
+  "autosend_every": 25,
   "skip_same": true,
   "same_eps": 2.0,
   "max_same_skips": 10,
