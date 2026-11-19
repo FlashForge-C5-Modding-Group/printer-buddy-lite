@@ -26,6 +26,7 @@ mkdir -p "$DATA/data/frames"
   "threshold": 0.6,
   "checks_in_a_row": 3,
   "pause": false,
+  "pause_at": 0.8,
   "card": true,
   "card_dir": "",
   "port": 7180,

@@ -50,3 +50,12 @@ yourself are always sent.
 Before scoring, `crop_left`, `crop_right`, `crop_top` and `crop_bottom` percent are cut off the camera frame
 (default 5, 5, 0, 0), so the door frame and empty air at the sides don't count. The rest is scaled to the model's
 input with pixel averaging, the same way the training images are resized.
+
+### Warnings, pausing and print history
+
+After `checks_in_a_row` checks at `threshold` or more, a warning goes to the printer's screen (M117) and the
+Mainsail/Fluidd console (`RESPOND`). With `pause` on, the print is paused only when the score reaches `pause_at`
+(default 0.8) for the same number of checks, once per print.
+
+When a print ends, a summary (checks, highest score, warned/paused) goes to `data/prints.jsonl` (the last 30
+prints) and shows under **Recent prints** in the WebUI.
