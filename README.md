@@ -44,3 +44,9 @@ with `/?action=snapshot` and `/snapshot`, and writes the first that answers to `
 With `contribute` and `autosend` on, photos labelled automatically when a print ends are sent one in every
 `autosend_every` (default 25; the count carries over between prints). The rest aren't sent. Photos you label
 yourself are always sent.
+
+### Crop
+
+Before scoring, `crop_left`, `crop_right`, `crop_top` and `crop_bottom` percent are cut off the camera frame
+(default 5, 5, 0, 0), so the door frame and empty air at the sides don't count. The rest is scaled to the model's
+input with pixel averaging, the same way the training images are resized.
