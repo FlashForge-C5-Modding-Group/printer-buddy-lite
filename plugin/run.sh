@@ -8,14 +8,16 @@ OC_PLUGIN=/usr/data/opencreator/plugin-manager/oc-plugin
 export SEP_AI_HOME="$DATA"
 export SEP_AI_MODELS="$HERE/models"
 
-if [ ! -f "$HERE/c/sep_ai" ]; then
-    echo "Printer Buddy Lite: missing binary $HERE/c/sep_ai" >&2
+BIN=/usr/data/opencreator/sep-ai/sep_ai
+
+if [ ! -f "$BIN" ]; then
+    echo "Printer Buddy Lite: external binary is missing: $BIN" >&2
     exit 1
 fi
 
-if [ ! -x "$HERE/c/sep_ai" ]; then
-    chmod 755 "$HERE/c/sep_ai" || {
-        echo "Printer Buddy Lite: unable to set executable permissions" >&2
+if [ ! -x "$BIN" ]; then
+    chmod 755 "$BIN" || {
+        echo "Printer Buddy Lite: unable to restore executable permissions" >&2
         exit 1
     }
     echo "Printer Buddy Lite: executable permissions restored."
@@ -72,4 +74,4 @@ if [ -f "$CONF" ]; then
     fi
 fi
 
-exec "$HERE/c/sep_ai"
+exec "$BIN"

@@ -14,7 +14,11 @@ fi
 for f in c/sep_ai webui/index.html models/pbai-x2600rv.bin models/printer-buddy-lite256.int8.bin models/int8.json; do
     [ -f "$HERE/$f" ] || { echo "Printer Buddy Lite: package file missing: $f" >&2; exit 1; }
 done
-chmod +x "$HERE/c/sep_ai"
+BIN_DIR=/usr/data/opencreator/sep-ai
+BIN="$BIN_DIR/sep_ai"
+mkdir -p "$BIN_DIR"
+cp "$HERE/c/sep_ai" "$BIN"
+chmod 755 "$BIN"
 mkdir -p "$DATA/data/frames"
 
 [ -f "$DATA/config.json" ] || cat > "$DATA/config.json" <<'JSON'
@@ -54,6 +58,6 @@ JSON
 # Keep every payload/data file readable and writable, directories traversable,
 # and every script or native entry point executable.
 chmod -R a+rwX "$HERE" "$DATA"
-chmod a+rwx "$HERE/plugin/"*.sh "$HERE/c/sep_ai"
+chmod a+rwx "$HERE/plugin/"*.sh
 
 echo "Printer Buddy Lite: web page on port 7180"
