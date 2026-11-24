@@ -8,7 +8,7 @@ OC_PLUGIN=/usr/data/opencreator/plugin-manager/oc-plugin
 export SEP_AI_HOME="$DATA"
 export SEP_AI_MODELS="$HERE/models"
 
-BIN=/usr/data/opencreator/sep-ai/sep_ai
+BIN=/usr/data/opencreator/sep-ai/c/sep_ai
 
 if [ ! -f "$BIN" ]; then
     echo "Printer Buddy Lite: external binary is missing: $BIN" >&2

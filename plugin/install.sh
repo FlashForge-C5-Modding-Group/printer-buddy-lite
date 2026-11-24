@@ -15,10 +15,11 @@ for f in c/sep_ai webui/index.html models/pbai-x2600rv.bin models/printer-buddy-
     [ -f "$HERE/$f" ] || { echo "Printer Buddy Lite: package file missing: $f" >&2; exit 1; }
 done
 BIN_DIR=/usr/data/opencreator/sep-ai
-BIN="$BIN_DIR/sep_ai"
-mkdir -p "$BIN_DIR"
+BIN="$BIN_DIR/c/sep_ai"
+mkdir -p "$BIN_DIR/c"
 cp "$HERE/c/sep_ai" "$BIN"
 chmod 755 "$BIN"
+ln -sfn "$HERE/webui" "$BIN_DIR/webui"
 mkdir -p "$DATA/data/frames"
 
 [ -f "$DATA/config.json" ] || cat > "$DATA/config.json" <<'JSON'
