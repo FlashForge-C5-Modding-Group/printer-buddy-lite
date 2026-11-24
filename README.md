@@ -47,9 +47,18 @@ yourself are always sent.
 
 ### Crop
 
-Before scoring, `crop_left`, `crop_right`, `crop_top` and `crop_bottom` percent are cut off the camera frame
-(default 5, 5, 0, 0), so the door frame and empty air at the sides don't count. The rest is scaled to the model's
-input with pixel averaging, the same way the training images are resized.
+By default the full camera frame is scored, matching the model's calibration and evaluation. To exclude the door
+frame or another unwanted area, set `crop_left`, `crop_right`, `crop_top` and `crop_bottom` to percentages of the
+frame to cut off (default 0, 0, 0, 0). The remaining image is scaled to the model's input with pixel averaging.
+
+### Zoomed second check
+
+With `zoom_check` on (the default), every full-frame alert candidate gets a second inference on the center 75% of
+the image. The alert counts only when the same failure class remains over the warning threshold in that closer view;
+the lower of the two scores is used. This filters objects that look suspicious at full-frame scale and gives small
+details a closer look. Clear frames need only one inference. The second look reuses the loaded model and its weights;
+only the input pixels change. Set `zoom_pct` to change the center area (50-100 percent), or turn `zoom_check` off in
+the WebUI to disable the extra inference.
 
 ### Warnings, pausing and print history
 

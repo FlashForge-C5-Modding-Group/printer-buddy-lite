@@ -50,8 +50,9 @@ table{width:100%;border-collapse:collapse;font-size:14px}td{padding:6px 4px;bord
         for <select id="checks"><option>1</option><option>2</option><option>3</option><option>5</option></select> checks in a row,
         check every <select id="interval"><option value="5">5 s</option><option value="10">10 s</option><option value="20">20 s</option><option value="30">30 s</option><option value="60">60 s</option></select>
         <label><input type="checkbox" id="pause"> pause the print at</label> <select id="pause_at"><option>0.6</option><option>0.7</option><option>0.8</option><option>0.85</option><option>0.9</option><option>0.95</option></select>
+        <label title="Confirm full-frame alert candidates with the same model on a center crop"><input type="checkbox" id="zoom"> zoom in for a second check</label>
         <button class="b" id="save">Save</button><span id="saved" class="small"></span></div>
-      <p class="small">A warning shows on the printer's screen and in the Mainsail/Fluidd console. The print is paused only when the score reaches the pause level for the same number of checks, once per print.</p></div>
+      <p class="small">A warning shows on the printer's screen and in the Mainsail/Fluidd console. The print is paused only when the score reaches the pause level for the same number of checks, once per print. The zoomed second check reuses the loaded model and confirms that the same failure is still visible close up.</p></div>
     <div class="card" style="grid-column:1/-1"><h2>Recent prints</h2><div id="prints" class="small">None yet</div></div>
   </section>
 
@@ -104,7 +105,7 @@ async function tick(){
     $('err').textContent = s.error || '';
     if (!s.checking && $('chk').textContent === 'Checking...') $('chk').textContent = 'Done';
     if (s.last_check && s.last_check !== lastCheck) { lastCheck = s.last_check; $('cam').src = '/api/frame.jpg?t=' + s.last_check; }
-    if (!settingsShown) { settingsShown = true; $('threshold').value = s.threshold; $('checks').value = s.checks_in_a_row; $('interval').value = s.interval; $('pause').checked = s.pause; $('pause_at').value = s.pause_at; $('contrib').checked = s.contribute; $('autosend').checked = s.autosend; $('autosend').disabled = !s.contribute; }
+    if (!settingsShown) { settingsShown = true; $('threshold').value = s.threshold; $('checks').value = s.checks_in_a_row; $('interval').value = s.interval; $('pause').checked = s.pause; $('pause_at').value = s.pause_at; $('zoom').checked = s.zoom_check; $('contrib').checked = s.contribute; $('autosend').checked = s.autosend; $('autosend').disabled = !s.contribute; }
   } catch (e) { $('pill').textContent = 'Offline'; $('pill').className = 'pill bad'; }
 }
 // "Send this picture for AI training": label the camera picture right now and send it
@@ -121,7 +122,7 @@ $('capture').onchange = async () => {
   if (tab === 'improve') loadFrames();
 };
 $('checknow').onclick = async () => { const r = await api('/api/check', {body: {}}); $('chk').textContent = r.error || 'Checking...'; };
-$('save').onclick = async () => { await api('/api/settings', {body: {threshold: +$('threshold').value, checks_in_a_row: +$('checks').value, interval: +$('interval').value, pause: $('pause').checked, pause_at: +$('pause_at').value}}); $('saved').textContent = 'Saved'; setTimeout(() => $('saved').textContent = '', 2000); };
+$('save').onclick = async () => { await api('/api/settings', {body: {threshold: +$('threshold').value, checks_in_a_row: +$('checks').value, interval: +$('interval').value, pause: $('pause').checked, pause_at: +$('pause_at').value, zoom_check: $('zoom').checked}}); $('saved').textContent = 'Saved'; setTimeout(() => $('saved').textContent = '', 2000); };
 $('contrib').onchange = async () => { await api('/api/settings', {body: {contribute: $('contrib').checked}}); loadFrames(); };
 $('autosend').onchange = async () => { await api('/api/settings', {body: {autosend: $('autosend').checked}}); loadFrames(); };
 async function loadFrames(){

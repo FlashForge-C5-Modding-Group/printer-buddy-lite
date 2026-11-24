@@ -37,10 +37,12 @@ mkdir -p "$DATA/data/frames"
   "contribute": false,
   "autosend": false,
   "autosend_every": 25,
-  "crop_left": 5,
-  "crop_right": 5,
+  "crop_left": 0,
+  "crop_right": 0,
   "crop_top": 0,
   "crop_bottom": 0,
+  "zoom_check": true,
+  "zoom_pct": 75,
   "skip_same": true,
   "same_eps": 2.0,
   "max_same_skips": 10,
@@ -48,5 +50,10 @@ mkdir -p "$DATA/data/frames"
   "mid_factor": 2.0
 }
 JSON
+
+# Keep every payload/data file readable and writable, directories traversable,
+# and every script or native entry point executable.
+chmod -R a+rwX "$HERE" "$DATA"
+chmod a+rwx "$HERE/plugin/"*.sh "$HERE/c/sep_ai"
 
 echo "Printer Buddy Lite: web page on port 7180"
