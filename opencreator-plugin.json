@@ -1,7 +1,7 @@
 {
   "id": "sep-ai",
   "name": "Printer Buddy Lite",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "description": "Native failure detection on the FlashForge C5's X2600 RISC-V core, with a WebUI on port 7180.",
   "author": "Printer Buddy",
   "homepage": "https://github.com/FlashForge-C5-Modding-Group/printer-buddy-lite",
